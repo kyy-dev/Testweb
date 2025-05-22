@@ -1,0 +1,162 @@
+<!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kuis IPS Sejarah</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }.container {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  text-align: center;
+  width: 90%;
+  max-width: 700px;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #00ffff;
+}
+
+.question-box {
+  margin-bottom: 20px;
+}
+
+.answers button {
+  background-color: #00ffff;
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  margin: 5px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.answers button:hover {
+  background-color: #00bcd4;
+}
+
+#scoreBox {
+  margin-top: 20px;
+  font-size: 1.2rem;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Kuis IPS Sejarah</h1>
+    <div class="question-box">
+      <p class="question" id="question">Memuat soal...</p>
+      <div class="answers" id="answers"></div>
+    </div>
+    <div id="scoreBox">Skor: <span id="score">0</span></div>
+  </div>  <script>
+    const questions = [
+      {
+        question: "Siapa Presiden ke-4 Indonesia?",
+        options: ["Soekarno", "Soeharto", "Abdurrahman Wahid", "Megawati"],
+        answer: 2
+      },
+      {
+        question: "Kapan Indonesia merdeka?",
+        options: ["17 Agustus 1945", "20 Mei 1908", "1 Juni 1945", "10 November 1945"],
+        answer: 0
+      },
+      {
+        question: "Apa nama organisasi pemuda yang lahir tahun 1928?",
+        options: ["Budi Utomo", "Sumpah Pemuda", "PETA", "Pemuda Indonesia"],
+        answer: 1
+      },
+      {
+        question: "Siapa tokoh proklamator Indonesia?",
+        options: ["Soekarno dan Hatta", "Soekarno dan Sjahrir", "Hatta dan Tan Malaka", "Soepomo dan Yamin"],
+        answer: 0
+      },
+      {
+        question: "Kerajaan Hindu tertua di Indonesia adalah?",
+        options: ["Majapahit", "Sriwijaya", "Kutai", "Tarumanegara"],
+        answer: 2
+      },
+      {
+        question: "Peristiwa G30S/PKI terjadi pada tahun?",
+        options: ["1965", "1945", "1955", "1975"],
+        answer: 0
+      },
+      {
+        question: "Tujuan utama VOC dibentuk adalah?",
+        options: ["Menyebarkan agama", "Menguasai perdagangan", "Menjajah Indonesia", "Mencari rempah-rempah"],
+        answer: 1
+      },
+      {
+        question: "Siapa pahlawan wanita dari Aceh?",
+        options: ["Cut Nyak Dien", "R.A. Kartini", "Dewi Sartika", "Martha Christina"],
+        answer: 0
+      },
+      {
+        question: "Tokoh perumus Pancasila adalah?",
+        options: ["Soeharto", "Moh. Yamin", "Soekarno", "Tan Malaka"],
+        answer: 2
+      },
+      {
+        question: "Perang Diponegoro berlangsung selama?",
+        options: ["1825-1830", "1945-1949", "1908-1915", "1750-1755"],
+        answer: 0
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function loadQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById("question").textContent = `${currentQuestion + 1}. ${q.question}`;
+      const answersDiv = document.getElementById("answers");
+      answersDiv.innerHTML = "";
+      q.options.forEach((option, index) => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.onclick = () => checkAnswer(index);
+        answersDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      if (selected === questions[currentQuestion].answer) {
+        score += 10;
+        alert("Benar!");
+      } else {
+        alert("Salah!");
+      }
+      document.getElementById("score").textContent = score;
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        alert("Kuis selesai! Skor akhir kamu: " + score);
+        // Kirim ke backend
+        fetch('http://localhost:3000/submit-score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ score })
+        }).then(res => res.json())
+          .then(data => console.log(data))
+          .catch(err => console.error(err));
+      }
+    }
+
+    window.onload = loadQuestion;
+  </script></body>
+</html>
